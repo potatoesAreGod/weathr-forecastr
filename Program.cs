@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿using System.Net;
 using System.Text.Json;
 
@@ -38,3 +39,18 @@ namespace weathr_forecastr {
         }
     }
 }
+=======
+﻿namespace weathrForecastr
+{
+    class Program
+    {
+        static void Main()
+        {
+            Console.WriteLine("Weathr Forecastr");
+            SmhiForecast.FetchSmhi();
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+    }
+}
+>>>>>>> d17d231d53605fcc53a86f16f46ca1ecd978a1cc
