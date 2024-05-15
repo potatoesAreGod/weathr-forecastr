@@ -1,54 +1,40 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 
-class Program
-{
-    static async Task FetchSmhi()
+namespace weathr_forecastr {
+    class Program
     {
-        double lat = 58;
-        double lon = 16;
-
-        string apiUrl = $"https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json";
-
-        HttpClient client = new();
-
-        try
+        static async Task FetchSmhi()
         {
-            // Make request
-            HttpResponseMessage response = await client.GetAsync(apiUrl);
-            response.EnsureSuccessStatusCode();
+            double lat = 58;
+            double lon = 16;
 
-            // Print headers
-            var headers = response.Headers;
-            Console.WriteLine("Headers:");
-            foreach (var header in headers)
+            string apiUrl = $"https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json";
+
+            HttpClient client = new();
+
+            try
             {
-                Console.WriteLine($"{header.Key}: {string.Join(", ", header.Value)}");
-            }
+                // Make request
+                HttpResponseMessage response = await client.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
 
-            // Read JSON
-            string jsonData = await response.Content.ReadAsStringAsync();
-            var jsonDataObject = JsonDocument.Parse(jsonData);
-            Console.WriteLine("JSON data:");
-            Console.WriteLine(jsonData);
 
-            if (jsonDataObject.RootElement.TryGetProperty("t", out JsonElement element))
+            } catch (Exception ex)
             {
-                Console.WriteLine("T value: {0}", element);
+                Console.WriteLine(ex.ToString());
             }
-        } catch (Exception ex)
-        {
-            Console.WriteLine(ex.ToString());
+            finally
+            {
+                client.Dispose();
+            }
         }
-        finally
-        {
-            client.Dispose();
-        }
-    }
 
-    static void Main()
-    {
-        Console.WriteLine("Weathr Forecastr");
-        FetchSmhi();
-        Console.ReadKey();
+        static void Main()
+        {
+            Console.WriteLine("Weathr Forecastr");
+            FetchSmhi();
+            Console.ReadKey();
+        }
     }
 }
