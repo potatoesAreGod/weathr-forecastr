@@ -2,30 +2,30 @@
 {
     public class Weather
     {
-        public DateTime ApprovedTime { get; set; }
-        public DateTime ReferenceTime { get; set; }
-        public Geometry Geometry { get; set; }
-        public TimeSeries[] TimeSeries { get; set; }
+        public DateTime approvedTime { get; set; }
+        public DateTime referenceTime { get; set; }
+        public Geometry geometry { get; set; }
+        public Timesery[] timeSeries { get; set; }
     }
 
     public class Geometry
     {
-        public string Type { get; set; }
-        public float[][] Coordinates { get; set; }
+        public string type { get; set; }
+        public float[][] coordinates { get; set; }
     }
 
-    public class TimeSeries
+    public class Timesery
     {
-        public DateTime ValidTime { get; set; }
-        public Parameter[] Parameters { get; set; }
+        public DateTime validTime { get; set; }
+        public Parameter[] parameters { get; set; }
     }
 
     public class Parameter
     {
-        public string Name { get; set; }
-        public string LevelType { get; set; }
-        public int Level { get; set; }
-        public string Unit { get; set; }
-        public float[] Values { get; set; }
+        public string name { get; set; }
+        public string levelType { get; set; }
+        public int level { get; set; }
+        public string unit { get; set; }
+        public float[] values { get; set; }
     }
 }

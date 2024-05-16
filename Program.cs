@@ -1,56 +1,54 @@
-<<<<<<< HEAD
-﻿using System.Net;
 using System.Text.Json;
 
 namespace weathr_forecastr {
     class Program
     {
-        static async Task FetchSmhi()
+        static void Main()
         {
-            double lat = 58;
-            double lon = 16;
+            Console.WriteLine("Weathr Forecastr");
 
-            string apiUrl = $"https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json";
+            string lon = "13.007812";
+            string lat = "56.394448";
+            Uri endpoint = new($"https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json");
 
             HttpClient client = new();
+            HttpResponseMessage result = client.GetAsync(endpoint).Result;
+            var json = result.Content.ReadAsStringAsync().Result;
+            var weather = JsonSerializer.Deserialize<Weather>(json);
 
-            try
+            if (weather != null)
             {
-                // Make request
-                HttpResponseMessage response = await client.GetAsync(apiUrl);
-                response.EnsureSuccessStatusCode();
+                foreach (var forecast in weather.timeSeries)
+                {
+                    if (forecast.validTime.Day == DateTime.UtcNow.Day && forecast.validTime.Hour == DateTime.UtcNow.Hour + 2)
+                    {
+                        var dayofweek = forecast.validTime.DayOfWeek;
+                        TimeSpan time = forecast.validTime.TimeOfDay;
+                        string unit = forecast.parameters[10].unit;
+                        float degrees = forecast.parameters[10].values[0];
+                        float wsybm2 = forecast.parameters[18].values[0];
+                        string desc = "";
 
+                        if (wsybm2 <= 2)
+                            desc = "Sunny";
+                        else if (wsybm2 >= 3 && wsybm2 <= 6)
+                            desc = "Cloudy";
+                        else if (wsybm2 == 7)
+                            desc = "Foggy";
+                        else if (wsybm2 >= 8 && wsybm2 <= 21)
+                            desc = "Rainy";
+                        else if (wsybm2 > 22)
+                            desc = "Snowy";
 
-            } catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
+                        Console.WriteLine("Current weather ({0} @ {1}): {2} and {3}{4}", dayofweek, time, desc, degrees, unit);
+                    }
+                }
             }
-            finally
+            else
             {
-                client.Dispose();
+                Console.WriteLine("Could not fetch weather. Try again later...");
             }
-        }
-
-        static void Main()
-        {
-            Console.WriteLine("Weathr Forecastr");
-            FetchSmhi();
             Console.ReadKey();
         }
     }
 }
-=======
-﻿namespace weathrForecastr
-{
-    class Program
-    {
-        static void Main()
-        {
-            Console.WriteLine("Weathr Forecastr");
-            SmhiForecast.FetchSmhi();
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
-        }
-    }
-}
->>>>>>> d17d231d53605fcc53a86f16f46ca1ecd978a1cc
