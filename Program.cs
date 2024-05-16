@@ -1,6 +1,7 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
-namespace weathr_forecastr {
+namespace weathr_forecastr
+{
     class Program
     {
         static void Main()
@@ -10,14 +11,14 @@ namespace weathr_forecastr {
             string lon = "13.007812";
             string lat = "56.394448";
             Uri endpoint = new($"https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json");
-
             HttpClient client = new();
-            HttpResponseMessage result = client.GetAsync(endpoint).Result;
-            var json = result.Content.ReadAsStringAsync().Result;
-            var weather = JsonSerializer.Deserialize<Weather>(json);
 
-            if (weather != null)
+            try
             {
+                HttpResponseMessage result = client.GetAsync(endpoint).Result;
+                var json = result.Content.ReadAsStringAsync().Result;
+                var weather = JsonSerializer.Deserialize<Weather>(json);
+
                 foreach (var forecast in weather.timeSeries)
                 {
                     if (forecast.validTime.Day == DateTime.UtcNow.Day && forecast.validTime.Hour == DateTime.UtcNow.Hour + 2)
@@ -44,9 +45,13 @@ namespace weathr_forecastr {
                     }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("Could not fetch weather. Try again later...");
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                client.Dispose();
             }
             Console.ReadKey();
         }
