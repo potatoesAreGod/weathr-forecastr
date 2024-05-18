@@ -4,56 +4,83 @@ namespace weathr_forecastr
 {
     class Program
     {
-        static void Main()
+        private static void GetWeather()
         {
-            Console.WriteLine("Weathr Forecastr");
-
-            string lon = "13.007812";
-            string lat = "56.394448";
+            // Variables for the api
+            string lon = "12.964";
+            string lat = "56.508";
             Uri endpoint = new($"https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json");
             HttpClient client = new();
 
             try
             {
+                // Try to get data from smhi
                 HttpResponseMessage result = client.GetAsync(endpoint).Result;
+                result.EnsureSuccessStatusCode();
+
+                // Deserialize the recieved json
                 var json = result.Content.ReadAsStringAsync().Result;
                 var weather = JsonSerializer.Deserialize<Weather>(json);
 
+                // Loop through all recieved data
                 foreach (var forecast in weather.timeSeries)
                 {
-                    if (forecast.validTime.Day == DateTime.UtcNow.Day && forecast.validTime.Hour == DateTime.UtcNow.Hour + 2)
+                    // Ensure we're recieving the relevant forecast
+                    if (forecast.validTime.ToString("yyyy-MM-dd HH") == DateTime.Now.ToString("yyyy-MM-dd HH"))
                     {
+                        // Extract relevant info
+                        // Date and time for the forecast
                         var dayofweek = forecast.validTime.DayOfWeek;
                         TimeSpan time = forecast.validTime.TimeOfDay;
-                        string unit = forecast.parameters[10].unit;
-                        float degrees = forecast.parameters[10].values[0];
-                        float wsybm2 = forecast.parameters[18].values[0];
-                        string desc = "";
 
-                        if (wsybm2 <= 2)
-                            desc = "Sunny";
-                        else if (wsybm2 >= 3 && wsybm2 <= 6)
-                            desc = "Cloudy";
-                        else if (wsybm2 == 7)
-                            desc = "Foggy";
-                        else if (wsybm2 >= 8 && wsybm2 <= 21)
-                            desc = "Rainy";
-                        else if (wsybm2 > 22)
-                            desc = "Snowy";
+                        // Current state of weather
+                        float symbol = forecast.parameters[18].values[0];
+                        string desc = weather.wsymb2[(int)symbol];
 
-                        Console.WriteLine("Current weather ({0} @ {1}): {2} and {3}{4}", dayofweek, time, desc, degrees, unit);
+                        // Current temperature
+                        string unit = "";
+                        float degrees = 0f;
+                        bool temperatureFound = false;
+
+                        // For some reason the temperature parameter change location,
+                        // therefore we have to loop through all parameters until we find it
+                        for (int i = 0; i < forecast.parameters.Length; i++)
+                        {
+                            if (forecast.parameters[i].name == "t")
+                            {
+                                degrees = forecast.parameters[i].values[0];
+                                unit = forecast.parameters[i].unit;
+                                temperatureFound = true;
+                                break;
+                            }
+                        }
+
+                        // Write forecast to user
+                        if (temperatureFound)
+                            Console.WriteLine("Current weather in Halmstad ({0} @ {1}): {2} and {3}{4}", dayofweek, time, desc, degrees, unit);
+                        else
+                            Console.WriteLine("Current weather in Halmstad ({0} @ {1}): {2}. Temperature data not available.", dayofweek, time, desc);
+
+                        break;
                     }
                 }
             }
+            // Catch exceptions
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
             finally
             {
+                // Close connection and free up resources
                 client.Dispose();
             }
-            Console.ReadKey();
+        }
+
+        static void Main()
+        {
+            Console.WriteLine("Weathr Forecastr");
+            GetWeather();
         }
     }
 }
