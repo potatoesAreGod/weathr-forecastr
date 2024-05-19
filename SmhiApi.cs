@@ -6,7 +6,7 @@
         public DateTime ApprovedTime { get; set; } // When the forecast was latest updated
         public DateTime ReferenceTime { get; set; } // When the forecast was approved by SMHI
         public Geometry Geometry { get; set; } // Where the forecast is valid
-        public Timeseries[] timeSeries { get; set; } // The different parameters mapped to each hour
+        public Timeseries[] timeSeries { get; set; } // Forecast hour by hour
         public string[] wsymb2 = [ // Definition of symbols
             "",
             "Clear sky",
@@ -42,20 +42,20 @@
     public class Timeseries
     {
         public DateTime validTime { get; set; } // When the forecast is valid
-        public Parameter[] parameters { get; set; } // The weather
+        public Parameter[] parameters { get; set; } // Weather data
     }
 
     public class Geometry
     {
-        public string Type { get; set; } // Which type of coordinates
-        public float[][] Coordinates { get; set; } // The coordinates in lon/lat
+        public string Type { get; set; } // Single point or area
+        public float[][] Coordinates { get; set; } // The coordinates
     }
 
     public class Parameter
     {
         public string name { get; set; } // Name of parameter
-        public string levelType { get; set; } // Level above sea or ground
-        public int level { get; set; } // Distance in meters
+        public string levelType { get; set; } // The types are level above ground or level above sea
+        public int level { get; set; } // The level in meters
         public string unit { get; set; } // Unit for values
         public float[] values { get; set; } // Actual value of the parameter
     }

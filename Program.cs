@@ -10,6 +10,8 @@ namespace weathr_forecastr
             string lon = "12.964";
             string lat = "56.508";
             Uri endpoint = new($"https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json");
+
+            // Create a client to make requests with
             HttpClient client = new();
 
             try
@@ -77,7 +79,7 @@ namespace weathr_forecastr
             }
         }
 
-        static void Main()
+        public static void Main()
         {
             Console.WriteLine("Weathr Forecastr");
             GetWeather();
